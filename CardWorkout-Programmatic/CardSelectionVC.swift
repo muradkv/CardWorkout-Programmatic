@@ -13,6 +13,8 @@ class CardSelectionVC: UIViewController {
     let stopButton = CWButton(backgroundColor: .systemRed, title: "Stop!")
     let resetButton = CWButton(backgroundColor: .systemGreen, title: "Reset")
     let rulesButton = CWButton(backgroundColor: .systemBlue, title: "Rules")
+    
+    var timer: Timer!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +22,7 @@ class CardSelectionVC: UIViewController {
         // Do any additional setup after loading the view.
         view.backgroundColor = .systemBackground
         configureUI()
+        startTimer()
     }
     
     func configureUI() {
@@ -29,10 +32,26 @@ class CardSelectionVC: UIViewController {
         configureRulesButton()
     }
     
+    @objc func startTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(randomCard), userInfo: nil, repeats: true)
+    }
+    
+    @objc func randomCard() {
+        cardImageView.image = Deck.allValues.randomElement()
+    }
+    
+    @objc func stopTimer() {
+        timer.invalidate()
+    }
+    
+    @objc func resetTimer() {
+        stopTimer()
+        startTimer()
+    }
+    
     func configureCardImageView() {
         view.addSubview(cardImageView)
         cardImageView.translatesAutoresizingMaskIntoConstraints = false
-        cardImageView.image = UIImage(named: "2C")
         
         NSLayoutConstraint.activate([
             cardImageView.widthAnchor.constraint(equalToConstant: 250),
@@ -44,6 +63,7 @@ class CardSelectionVC: UIViewController {
     
     func configureStopButton() {
         view.addSubview(stopButton)
+        stopButton.addTarget(self, action: #selector(stopTimer), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             stopButton.widthAnchor.constraint(equalToConstant: 260),
@@ -55,6 +75,7 @@ class CardSelectionVC: UIViewController {
     
     func configureResetButton() {
         view.addSubview(resetButton)
+        resetButton.addTarget(self, action: #selector(resetTimer), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             resetButton.widthAnchor.constraint(equalToConstant: 115),
@@ -66,7 +87,6 @@ class CardSelectionVC: UIViewController {
     
     func configureRulesButton() {
         view.addSubview(rulesButton)
-        
         rulesButton.addTarget(self, action: #selector(presentRulesVC), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
